@@ -5,6 +5,18 @@ import logo from './logo.svg'
 import './App.css'
 
 class App extends Component {
+  state = {
+    name: '',
+    status: '',
+    gender: '',
+    filter: false
+  }
+
+  setFilterData = (filterData, filter) => {
+    const { name, status, gender } = filterData
+    this.setState({ name, status, gender, filter })
+  }
+
   render () {
     return (
       <div className="min-h-screen">
@@ -12,10 +24,10 @@ class App extends Component {
           <img src={logo} className="my-8 h-24 w-auto mx-auto" alt="logo"/>
           <div className="flex flex-row">
             <div className="w-1/4 p-4 mb-4">
-              <Filter/>
+              <Filter filterRecords={this.setFilterData}/>
             </div>
             <div className="flex-1 p-4">
-              <Characters/>
+              <Characters filterData={this.state}/>
             </div>
           </div>
         </div>

@@ -4,14 +4,14 @@ import PropTypes from 'prop-types'
 class Pagination extends Component {
   constructor (props) {
     super(props)
-    const { totalRecords = null, perPage = 30 } = props
+    const { perPage, totalRecords } = props
 
-    this.pageLimit = typeof perPage === 'number' ? perPage : 30
-    this.totalRecords = typeof totalRecords === 'number' ? totalRecords : 0
+    this.state = {
+      currentPage: 1,
+      perPage
+    }
 
-    this.totalPages = Math.ceil(this.totalRecords / this.pageLimit)
-
-    this.state = { currentPage: 1 }
+    this.totalPages = Math.ceil(totalRecords / perPage)
   }
 
   fetchPageNumbers = () => {
@@ -117,13 +117,35 @@ class Pagination extends Component {
     }
   }
 
-  setCurrentPage (page) {
+  setCurrentPage = (page) => {
     this.setState({
       currentPage: page
-    }, () => this.props.onPageChanged(page))
+    }, () => this.props.onPageChanged())
+  }
+
+  setPerPage = (e) => {
+    this.props.onPerPageChanged(parseInt(e.target.value))
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    if (prevProps.totalRecords !== this.props.totalRecords) {
+      this.totalPages = Math.ceil(this.props.totalRecords / this.props.perPage)
+    }
   }
 
   render () {
+    const { totalRecords, perPage } = this.props
+    const { currentPage } = this.state
+
+    const firstRecord = perPage * (currentPage - 1) + 1
+    const lastPageRecords = totalRecords % perPage
+    let totalRecordsOnPage = 0
+
+    if (currentPage === this.totalPages) {
+      totalRecordsOnPage = (perPage * (currentPage - 1)) + lastPageRecords
+    } else {
+      totalRecordsOnPage = currentPage * perPage
+    }
     return (
       <div className="mt-5 flex flex-row justify-between items-center">
         <div className="grid grid-cols-7 gap-3">
@@ -155,15 +177,16 @@ class Pagination extends Component {
         </div>
         <div className="flex flex-row items center">
           <select id="country" name="country" autoComplete="country"
-                  className="font-semibold mr-4">
-            <option>10</option>
-            <option>20</option>
-            <option>30</option>
-            <option>40</option>
-            <option>50</option>
+                  className="font-semibold mr-4" onChange={this.setPerPage} value={this.props.perPage}>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
           </select>
           <div className="flex items-center">
-            <span className="font-semibold text-gray-300">Showing 1-50 of 235</span>
+            <span
+              className="font-semibold text-gray-300">
+              Showing {firstRecord} - {totalRecordsOnPage} of {totalRecords}</span>
           </div>
         </div>
       </div>
@@ -172,8 +195,8 @@ class Pagination extends Component {
 }
 
 Pagination.propTypes = {
-  totalRecords: PropTypes.number.isRequired,
   perPage: PropTypes.number,
+  totalRecords: PropTypes.number,
   onPageChanged: PropTypes.func
 }
 

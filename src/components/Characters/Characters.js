@@ -1,47 +1,88 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 import Character from './Character/Character'
 import Pagination from './Pagination/Pagination'
+import PropTypes from 'prop-types'
 
 class Characters extends Component {
-  state = {
-    characters: [
-      {
-        image: 'https://images.unsplash.com/photo-1606787366850-de6330128bfc?ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80',
-        name: 'Rick Sanchez',
-        origin: 'Earth',
-        gender: 'Male',
-        species: 'Human',
-        status: 'alive'
-      },
-      {
-        image: 'https://images.unsplash.com/photo-1606787366850-de6330128bfc?ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80',
-        name: 'Rick Sanchez',
-        origin: 'Earth',
-        gender: 'Male',
-        species: 'Human',
-        status: 'dead'
-      },
-      {
-        image: 'https://images.unsplash.com/photo-1606787366850-de6330128bfc?ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80',
-        name: 'Rick Sanchez',
-        origin: 'Earth',
-        gender: 'Male',
-        species: 'Human',
-        status: 'unknown'
-      }
-    ]
+
+  constructor (props) {
+    super(props)
+    this.paginationRef = React.createRef()
+    this.state = {
+      characters: [],
+      totalRecords: 0,
+      perPage: 5
+    }
+  }
+
+  fetchNextPage = () => {
+    if (this.props.filterData.filter) {
+      this.fetchFilteredPage()
+    } else {
+      this.fetchNewPage()
+    }
+  }
+
+  fetchNewPage = () => {
+    const pageData = this.paginationRef.current
+    const range = [...Array(pageData.state.perPage).keys()].map(i => i + 1 + pageData.state.perPage * (pageData.state.currentPage - 1))
+    axios.get('https://rickandmortyapi.com/api/character/' + range)
+      .then((response) => {
+        this.setState({
+          characters: response.data
+        })
+      })
+  }
+
+  fetchFilteredPage = () => {
+    const name = this.props.filterData.name !== '' ? '&name=' + this.props.filterData.name : ''
+    const gender = this.props.filterData.gender !== '' ? '&gender=' + this.props.filterData.gender : ''
+    const status = this.props.filterData.status !== '' ? '&status=' + this.props.filterData.status : ''
+    const pageData = this.paginationRef.current
+    const page = pageData.state.currentPage
+
+    axios.get('https://rickandmortyapi.com/api/character/?page=' + page + name + gender + status)
+      .then((response) => {
+        console.log(response.data)
+        this.setState({
+          totalRecords: response.data.info.count,
+          characters: response.data.results,
+          perPage: 20
+        })
+      })
+  }
+
+  setPerPage = (perPage) => {
+    this.setState({ perPage })
+  }
+
+  componentDidMount () {
+    axios.get('https://rickandmortyapi.com/api/character')
+      .then((response) => {
+        this.fetchNewPage()
+        this.setState({
+          totalRecords: response.data.info.count
+        })
+      })
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    if (prevProps.filterData !== this.props.filterData) {
+      this.fetchFilteredPage()
+    }
   }
 
   render () {
     const { state } = this
     return (
       <div className="card ">
-        <h1 className="text-2xl font-semibold">Characters</h1>
+        <h1 className="text-2xl font-semibold">Characters {this.state.currentPage}</h1>
         <p className="my-4 text-gray-400">More than 400+ characters</p>
 
         <div className="flex flex-col py-4">
-          <div className="grid grid-cols-5 py-4 px-6 font-semibold text-gray-400 uppercase bg-rm-gray rounded-lg">
-            <div className="col-span-2 text-gray-600">Character</div>
+          <div className="grid grid-cols-6 py-4 px-6 font-semibold text-gray-400 uppercase bg-rm-gray rounded-lg">
+            <div className="col-span-3 text-gray-600">Character</div>
             <div>Gender</div>
             <div>Species</div>
             <div>Status</div>
@@ -60,10 +101,20 @@ class Characters extends Component {
             </div>
         }
 
-        <Pagination perPage={10} totalRecords={50}/>
+        <Pagination
+          ref={this.paginationRef}
+          perPage={this.state.perPage}
+          totalRecords={this.state.totalRecords}
+          onPageChanged={this.fetchNextPage}
+          onPerPageChanged={this.setPerPage}
+        />
       </div>
     )
   }
+}
+
+Characters.propTypes = {
+  filterData: PropTypes.object,
 }
 
 export default Characters
