@@ -28,7 +28,7 @@
     }
 
     .pagination.navigation {
-        @apply bg-rm-gray text-gray-400;
+        @apply bg-rm-gray text-gray-500;
     }
 
     .pagination.page {
@@ -37,5 +37,9 @@
 
     .pagination:hover, .pagination.active {
         @apply bg-blue-500 text-white;
+    }
+
+    .pagination.navigation.disabled, .pagination.navigation.disabled:hover {
+        @apply bg-rm-gray text-gray-300 cursor-not-allowed;
     }
 }
