@@ -1,28 +1,27 @@
-import React, {Component} from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import Characters from './components/Characters/Characters'
+import Filter from './components/Filter/Filter'
+import logo from './logo.svg'
+import './App.css'
 
 class App extends Component {
-  render (){
+  render () {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div className="min-h-screen">
+        <div className="container mx-auto">
+          <img src={logo} className="my-8 h-24 w-auto mx-auto" alt="logo"/>
+          <div className="flex flex-row">
+            <div className="w-1/4 p-4 mb-4">
+              <Filter/>
+            </div>
+            <div className="flex-1 p-4">
+              <Characters/>
+            </div>
+          </div>
+        </div>
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App

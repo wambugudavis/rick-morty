@@ -1,3 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-rm-gray;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    select, input {
+        @apply py-3 px-4 bg-rm-gray text-gray-600 rounded-md;
+    }
+
+    select:focus, input:focus {
+        @apply outline-none ring-blue-400 border-blue-400
+    }
+}
+@layer components {
+    .card {
+        @apply bg-white rounded-xl p-6;
+    }
+
+    .pagination {
+        @apply p-2 h-8 w-8 rounded-md flex justify-center items-center cursor-pointer;
+    }
+
+    .pagination.navigation {
+        @apply bg-rm-gray text-gray-400;
+    }
+
+    .pagination.page {
+        @apply font-semibold text-gray-800;
+    }
+
+    .pagination:hover, .pagination.active {
+        @apply bg-blue-500 text-white;
+    }
+}
