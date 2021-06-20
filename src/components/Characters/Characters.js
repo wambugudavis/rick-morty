@@ -24,9 +24,19 @@ class Characters extends Component {
     }
   }
 
+  fetchFirstPage = () => {
+    axios.get('https://rickandmortyapi.com/api/character')
+      .then((response) => {
+        this.fetchNewPage()
+        this.setState({
+          totalRecords: response.data.info.count
+        })
+      })
+  }
+
   fetchNewPage = () => {
     const pageData = this.paginationRef.current
-    const range = [...Array(pageData.state.perPage).keys()].map(i => i + 1 + pageData.state.perPage * (pageData.state.currentPage - 1))
+    const range = [...Array(this.state.perPage).keys()].map(i => i + 1 + this.state.perPage * (pageData.state.currentPage - 1))
     axios.get('https://rickandmortyapi.com/api/character/' + range)
       .then((response) => {
         this.setState({
@@ -35,16 +45,15 @@ class Characters extends Component {
       })
   }
 
-  fetchFilteredPage = () => {
+  fetchFilteredPage = (reset) => {
     const name = this.props.filterData.name !== '' ? '&name=' + this.props.filterData.name : ''
     const gender = this.props.filterData.gender !== '' ? '&gender=' + this.props.filterData.gender : ''
     const status = this.props.filterData.status !== '' ? '&status=' + this.props.filterData.status : ''
     const pageData = this.paginationRef.current
-    const page = pageData.state.currentPage
+    const page = reset ? 1 : pageData.state.currentPage
 
     axios.get('https://rickandmortyapi.com/api/character/?page=' + page + name + gender + status)
       .then((response) => {
-        console.log(response.data)
         this.setState({
           totalRecords: response.data.info.count,
           characters: response.data.results,
@@ -58,18 +67,25 @@ class Characters extends Component {
   }
 
   componentDidMount () {
-    axios.get('https://rickandmortyapi.com/api/character')
-      .then((response) => {
-        this.fetchNewPage()
-        this.setState({
-          totalRecords: response.data.info.count
-        })
-      })
+    this.fetchFirstPage()
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
+    if (prevState.perPage !== this.state.perPage) {
+      this.fetchNextPage()
+    }
+
     if (prevProps.filterData !== this.props.filterData) {
-      this.fetchFilteredPage()
+      if (!this.props.filterData.filter) {
+        this.setState({
+          perPage: 5
+        }, () => {
+          this.fetchFirstPage()
+        })
+      } else {
+        const resetPages = true
+        this.fetchFilteredPage(resetPages)
+      }
     }
   }
 
@@ -107,6 +123,7 @@ class Characters extends Component {
           totalRecords={this.state.totalRecords}
           onPageChanged={this.fetchNextPage}
           onPerPageChanged={this.setPerPage}
+          toggleFilter={this.props.filterData}
         />
       </div>
     )

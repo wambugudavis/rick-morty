@@ -8,7 +8,7 @@ class Pagination extends Component {
 
     this.state = {
       currentPage: 1,
-      perPage
+      pageNumbers: [1]
     }
 
     this.totalPages = Math.ceil(totalRecords / perPage)
@@ -20,7 +20,11 @@ class Pagination extends Component {
     const prevPage = currentPage > 1 ? currentPage - 1 : null
     const nextPage = currentPage < totalPages ? currentPage + 1 : null
 
-    if (prevPage == null && nextPage < totalPages) {
+    console.log(prevPage)
+    console.log(nextPage)
+    if (nextPage == null && prevPage == null) {
+      return [currentPage]
+    } else if (prevPage == null && nextPage < totalPages) {
       return [currentPage, nextPage, nextPage + 1]
     } else if (nextPage == null && prevPage > 1) {
       return [prevPage - 1, prevPage, currentPage]
@@ -128,8 +132,20 @@ class Pagination extends Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    if (prevProps.totalRecords !== this.props.totalRecords) {
+    if (prevProps !== this.props) {
       this.totalPages = Math.ceil(this.props.totalRecords / this.props.perPage)
+      const pageNumbers = this.fetchPageNumbers()
+      this.setState({
+        pageNumbers
+      })
+    }
+
+    if (prevProps.toggleFilter !== this.props.toggleFilter) {
+      if (this.props.toggleFilter.filter) {
+        this.setState({
+          currentPage: 1
+        })
+      }
     }
   }
 
@@ -197,7 +213,8 @@ class Pagination extends Component {
 Pagination.propTypes = {
   perPage: PropTypes.number,
   totalRecords: PropTypes.number,
-  onPageChanged: PropTypes.func
+  onPageChanged: PropTypes.func,
+  toggleFilter: PropTypes.bool
 }
 
 export default Pagination
