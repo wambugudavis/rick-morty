@@ -119,6 +119,27 @@ class Pagination extends Component {
     }
   }
 
+  renderSelectOptions () {
+    if (this.props.toggleFilter.filter) {
+      return (
+        <select id="country" name="country" autoComplete="country"
+                className="font-semibold mr-4" value={this.props.perPage}>
+          <option value={20}>20</option>
+        </select>
+      )
+    } else {
+      return (
+        <select id="country" name="country" autoComplete="country"
+                className="font-semibold mr-4" onChange={this.setPerPage} value={this.props.perPage}>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={50}>50</option>
+        </select>
+      )
+    }
+  }
+
   setCurrentPage = (page) => {
     this.setState({
       currentPage: page
@@ -190,13 +211,7 @@ class Pagination extends Component {
           {this.renderLastPageButton()}
         </div>
         <div className="flex flex-row items center">
-          <select id="country" name="country" autoComplete="country"
-                  className="font-semibold mr-4" onChange={this.setPerPage} value={this.props.perPage}>
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
+          {this.renderSelectOptions()}
           <div className="flex items-center">
             <span
               className="font-semibold text-gray-300">
