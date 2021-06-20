@@ -59,7 +59,9 @@ class Characters extends Component {
           characters: response.data.results,
           perPage: 20
         })
-      })
+      }).catch((error) => {
+      this.props.addToast(error.response.data.error)
+    })
   }
 
   setPerPage = (perPage) => {
@@ -132,6 +134,7 @@ class Characters extends Component {
 
 Characters.propTypes = {
   filterData: PropTypes.object,
+  addToast: PropTypes.func,
 }
 
 export default Characters

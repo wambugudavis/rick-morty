@@ -20,8 +20,6 @@ class Pagination extends Component {
     const prevPage = currentPage > 1 ? currentPage - 1 : null
     const nextPage = currentPage < totalPages ? currentPage + 1 : null
 
-    console.log(prevPage)
-    console.log(nextPage)
     if (nextPage == null && prevPage == null) {
       return [currentPage]
     } else if (prevPage == null && nextPage < totalPages) {
@@ -214,7 +212,7 @@ Pagination.propTypes = {
   perPage: PropTypes.number,
   totalRecords: PropTypes.number,
   onPageChanged: PropTypes.func,
-  toggleFilter: PropTypes.bool
+  toggleFilter: PropTypes.object
 }
 
 export default Pagination
